@@ -5,7 +5,7 @@ import pickle
 
 
 #directory for the data
-data_dir = 'C:/Users/ryan/Documents/REU/WESAD Learning/WESAD/'
+data_dir = '.../WESAD/'
 
 #label sampling frequency
 LABEL_SF = 700
