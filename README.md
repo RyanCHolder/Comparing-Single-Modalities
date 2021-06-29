@@ -21,7 +21,13 @@ Once the data has been saved the alg_testing.py script can be used in a similar 
   
   Both testing functions will create new text files with the specified names, and will rewrite the file with the given name if it already exists.
   
+  Some warnings will be triggered by running the alg_testing script including the convolutional network classifier since the statistical data will 
+  be ignored for that classifier (statistical data doesn't fit the dimensional requirements), and the printing of the stastical results averages
+  will involve a divide by zero. However, these warning can be ignored because the results are unaffected by this (stastical values during convolutional
+  training will just be Nan)
+  
   Notes:
+    
     1 second windows with 50% overlap were used as time steps
     All invalid labels, as well as the amusement label from the WESAD data were ignored
     The meditation and baseline labels were combined into a non-stressed label
