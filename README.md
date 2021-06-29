@@ -32,6 +32,7 @@ Once the data has been saved the alg_testing.py script can be used in a similar 
   All invalid labels, as well as the amusement label from the WESAD data were ignored
   The meditation and baseline labels were combined into a non-stressed label
   After combining baseline and meditation, the data had a rough 3:1 ratio of non-stress to stressed labels
+  A few of the classifiers have been commented out as they are quite slow, but removing the commenting will still run if those classifiers are wanted.
   
   The WESAD dataset that was used can be found here:
   https://ubicomp.eti.uni-siegen.de/home/datasets/icmi18/
