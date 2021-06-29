@@ -28,7 +28,7 @@ Once the data has been saved the alg_testing.py script can be used in a similar 
   
   Notes -
     
-    1 second windows with 50% overlap were used as time steps
-    All invalid labels, as well as the amusement label from the WESAD data were ignored
-    The meditation and baseline labels were combined into a non-stressed label
-    After combining baseline and meditation, the data had a rough 3:1 ratio of non-stress to stressed labels
+  1 second windows with 50% overlap were used as time steps
+  All invalid labels, as well as the amusement label from the WESAD data were ignored
+  The meditation and baseline labels were combined into a non-stressed label
+  After combining baseline and meditation, the data had a rough 3:1 ratio of non-stress to stressed labels
