@@ -14,9 +14,15 @@ Once the data has been saved the alg_testing.py script can be used in a similar 
     
   To run a test with a randomly selected test group (at 25% test size), call the reg_testing(save_path), if your file hierarchy doesn't match the one encoded
   then additional to the save_path parameter (which would be the string for the destination of the results), the data_loc and stat_loc parameters
-  should be specified to the file locations of the formatted statistical and regular formatted data.
+  should be specified to the file locations of the formatted regular and statistical data respectively.
   Additionally the number of iterations can be specified as another parameter (default: iterations=10)
   
   To run a leave-one-out test, a similar procedure should be followed with the leave_one_out(save_path) function.
   
   Both testing functions will create new text files with the specified names, and will rewrite the file with the given name if it already exists.
+  
+  Notes:
+    1 second windows with 50% overlap were used as time steps
+    All invalid labels, as well as the amusement label from the WESAD data were ignored
+    The meditation and baseline labels were combined into a non-stressed label
+    After combining baseline and meditation, the data had a rough 3:1 ratio of non-stress to stressed labels
