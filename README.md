@@ -26,7 +26,7 @@ Once the data has been saved the alg_testing.py script can be used in a similar 
   will involve a divide by zero. However, these warning can be ignored because the results are unaffected by this (stastical values during convolutional
   training will just be Nan)
   
-  Notes:
+  Notes -
     
     1 second windows with 50% overlap were used as time steps
     All invalid labels, as well as the amusement label from the WESAD data were ignored
