@@ -26,6 +26,11 @@ Once the data has been saved the alg_testing.py script can be used in a similar 
   will involve a divide by zero. However, these warning can be ignored because the results are unaffected by this (stastical values during convolutional
   training will just be Nan)
   
+  The visuals.py script can be run to create graphs of the data.
+  By running plot_formatted(subject), where subject is a string coressponding to the desired subject number, the formatted data will be plotted 
+  (using the averages of each time step)
+  Running plot_unformatted(subject) will plot the original un-edited data for the desired subject
+  
   Notes -
     
   1 second windows with 50% overlap were used as time steps
