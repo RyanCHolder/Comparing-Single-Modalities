@@ -22,13 +22,13 @@ BVP_SF = 64
 EDA_SF = 4
 TEMP_SF = 4
 
-#list of classifiers, these can be easily commented out if not wanted
+#list of classifiers, these can be easily commented out if not wanted, some commented out for speed
 classifiers = [#SVC(),
-        RandomForestClassifier(),
-        #MLPClassifier()
+        #RandomForestClassifier(),
+        #MLPClassifier(),
         KNeighborsClassifier(),
         DecisionTreeClassifier(),
-        AdaBoostClassifier(DecisionTreeClassifier()),
+        #AdaBoostClassifier(DecisionTreeClassifier()),
         #AdaBoostClassifier(RandomForestClassifier()),
         #GradientBoostingClassifier(),
         Sequential()]
@@ -121,7 +121,7 @@ def reg_testing(save_path, data_loc=None, stat_loc=None, iterations=10, save_ite
     file.write("Results of repeated testing with random test set\n\n")
 
     #progress tracking
-    print("Loaded Data")
+    print("Loaded Data", flush=True)
 
     #counter to track progress
     algcount = 0;
@@ -130,7 +130,7 @@ def reg_testing(save_path, data_loc=None, stat_loc=None, iterations=10, save_ite
     for clf in classifiers:
         #track progress in terminal
         algcount += 1
-        print("Running algorithm " + str(algcount) + " of " + str(len(classifiers)))
+        print("Running algorithm " + str(algcount) + " of " + str(len(classifiers)), flush=True)
         #title the algorithm in the file
         file.write(str(clf)+'\n\n')
 
@@ -144,7 +144,7 @@ def reg_testing(save_path, data_loc=None, stat_loc=None, iterations=10, save_ite
 
         #run each algorithm for ten iterations
         for i in range(iterations):
-            print('Running Iteration ' + str(i+1))
+            print('Running Iteration ' + str(i+1), flush=True)
 
             #label the iteration
             if save_iters:
@@ -271,7 +271,7 @@ def leave_one_out(save_path, data_loc=None, stat_loc=None):
         stat_all.append(s_temp)
     #we now have the data for all but a given subject
 
-    print('Loaded Data')
+    print('Loaded Data', flush=True)
 
     #open file
     file = open(save_path, 'wt')
@@ -284,7 +284,7 @@ def leave_one_out(save_path, data_loc=None, stat_loc=None):
     for clf in classifiers:
         #print progress
         algcount += 1
-        print('Running algorithm ' + str(algcount) + ' of ' + str(len(classifiers)))
+        print('Running algorithm ' + str(algcount) + ' of ' + str(len(classifiers)), flush=True)
 
         #classifier title
         file.write(str(clf)+'\n\n')
@@ -299,7 +299,7 @@ def leave_one_out(save_path, data_loc=None, stat_loc=None):
 
         #find and save results
         for x in range(len(reg_all)):
-            print('Running subject ' + str(x) + ' of 14')
+            print('Running subject ' + str(x) + ' of 14', flush=True)
             file.write('Testing on subject '+str(x)+'\n')
             for feat in features:
                 #run the algorithm with all but one subject as training data
@@ -314,12 +314,13 @@ def leave_one_out(save_path, data_loc=None, stat_loc=None):
                 reg_fs[feat].append(fs)
 
                 #train on statistical data
-                acc, fs = train_alg(clf,stat_all[x]['data'][feat],
-                    stat_subjects[x]['data'][feat],stat_all[x]['labels'],
-                    stat_subjects[x]['labels'])
+                if(type(clf) != type(Sequential())):
+                    acc, fs = train_alg(clf,stat_all[x]['data'][feat],
+                        stat_subjects[x]['data'][feat],stat_all[x]['labels'],
+                        stat_subjects[x]['labels'])
 
-                stat_accs[feat].append(acc)
-                stat_fs[feat].append(fs)
+                    stat_accs[feat].append(acc)
+                    stat_fs[feat].append(fs)
 
                 #individual accuracies
                 file.write('Regular Data '+feat+', Accuracy = '
@@ -352,3 +353,4 @@ def leave_one_out(save_path, data_loc=None, stat_loc=None):
             +'BVP: Accuracy = '+stat_avg_accs[1]+', F Score = '+stat_avg_fs[1]+'\n'
             +'EDA: Accuracy = '+stat_avg_accs[2]+', F Score = '+stat_avg_fs[2]+'\n'
             +'TEMP: Accuracy = '+stat_avg_accs[3]+', F Score = '+stat_avg_fs[3]+'\n\n')
+6
