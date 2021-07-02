@@ -22,7 +22,7 @@ BVP_SF = 64
 EDA_SF = 4
 TEMP_SF = 4
 
-#list of classifiers, these can be easily commented out if not wanted, some commented out for speed
+#list of classifiers, these can be easily commented out if not wanted
 classifiers = [#SVC(),
         #RandomForestClassifier(),
         #MLPClassifier(),
@@ -313,6 +313,11 @@ def leave_one_out(save_path, data_loc=None, stat_loc=None):
                 reg_accs[feat].append(acc)
                 reg_fs[feat].append(fs)
 
+                #individual regular results6
+                file.write('Regular Data '+feat+', Accuracy = '
+                    +str(reg_accs[feat][x])+', F Score = '
+                    +str(reg_fs[feat][x])+'\n')
+
                 #train on statistical data
                 if(type(clf) != type(Sequential())):
                     acc, fs = train_alg(clf,stat_all[x]['data'][feat],
@@ -322,13 +327,10 @@ def leave_one_out(save_path, data_loc=None, stat_loc=None):
                     stat_accs[feat].append(acc)
                     stat_fs[feat].append(fs)
 
-                #individual accuracies
-                file.write('Regular Data '+feat+', Accuracy = '
-                    +str(reg_accs[feat][x])+', F Score = '
-                    +str(reg_fs[feat][x])+'\n')
-                file.write('Statistical Data '+feat+', Accuracy = '
-                    +str(stat_accs[feat][x])+', F Score = '
-                    +str(stat_fs[feat][x])+'\n\n')
+                    #individual stat results
+                    file.write('Statistical Data '+feat+', Accuracy = '
+                        +str(stat_accs[feat][x])+', F Score = '
+                        +str(stat_fs[feat][x])+'\n\n')
 
         #average accuracies
         reg_avg_accs = [str(np.mean(reg_accs['ACC'])),str(np.mean(reg_accs['BVP'])),
@@ -352,5 +354,4 @@ def leave_one_out(save_path, data_loc=None, stat_loc=None):
             +'ACC: Accuracy = '+stat_avg_accs[0]+', F Score = '+stat_avg_fs[0]+'\n'
             +'BVP: Accuracy = '+stat_avg_accs[1]+', F Score = '+stat_avg_fs[1]+'\n'
             +'EDA: Accuracy = '+stat_avg_accs[2]+', F Score = '+stat_avg_fs[2]+'\n'
-            +'TEMP: Accuracy = '+stat_avg_accs[3]+', F Score = '+stat_avg_fs[3]+'\n\n')
-6
+            +'TEMP: Accuracy = '+stat_avg_accs[3]+', F Score = '+stat_avg_fs[3]+'\n\n')6
