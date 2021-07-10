@@ -1,5 +1,6 @@
 import pickle
 import numpy as np
+from os import listdir
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
@@ -23,7 +24,7 @@ EDA_SF = 4
 TEMP_SF = 4
 
 #list of classifiers, these can be easily commented out if not wanted
-classifiers = [#SVC(),
+#classifiers = [#SVC(),
         #RandomForestClassifier(),
         #MLPClassifier(),
         KNeighborsClassifier(),
@@ -104,15 +105,15 @@ def reg_testing(save_path, data_loc=None, stat_loc=None, iterations=10, save_ite
     """
     #regular data
     if(data_loc==None):
-        data = load_file('Data/Regular/All.pkl')
+        data = load_file('Data/Raw/All.pkl')
     else:
-        data = load_file(data_loc)
+        data = load_file(data_loc + '/All.pkl')
 
     #statistical data
     if(stat_loc==None):
         stat = load_file('Data/Statistical/All.pkl')
     else:
-        stat = load_file(stat_loc)
+        stat = load_file(stat_loc + '/All.pkl')
 
     #open save destination for results
     file = open(save_path, 'wt')
@@ -219,29 +220,40 @@ def reg_testing(save_path, data_loc=None, stat_loc=None, iterations=10, save_ite
     #close the file
     file.close()
 
-def leave_one_out(save_path, data_loc=None, stat_loc=None):
+def leave_one_out(save_path, data_loc=None, stat_loc=None, window_size=1):
     """
         @breif: trains on all but one subject's data, tests on that subject
         @param: save_path (string): The file destination for the results
-        @param: data_loc (string): The file containing the regular data
+        @param: data_loc (string): The file containing the raw data
         @param: stat_loc (string): The file containing the statistical data
+        @param: window_size (int): Seconds in window for proper shaping
     """
     #create lists of all subject's data
     reg_subjects = list()
     stat_subjects = list()
-    for x in range(2,18):
-        if x != 12:
-            #load regular data for subject
-            if(data_loc==None):
-                reg_subjects.append(load_file('Data/Regular/S'+str(x)+'.pkl'))
-            else:
-                reg_subject.append(load_file(data_loc))
 
-            #load statistical data for subject
-            if(stat_loc==None):
-                stat_subjects.append(load_file('Data/Statistical/S'+str(x)+'.pkl'))
-            else:
-                stat_subjects.append(load_file(stat_loc))
+    #raw data location
+    if data_loc==None:
+        data_loc = 'Data/Raw'
+    #list raw files
+    raw_files = listdir(data_loc)
+    #append each subject from raw files
+    for f in raw_files:
+        #load raw data for subject
+        if(f != 'All.pkl'):
+            reg_subjects.append(load_file(data_loc + '/' + f))
+            print(f)
+
+    #stat data location
+    if stat_loc == None:
+        stat_loc = 'Data/Statistical'
+    #list stat files
+    stat_files = listdir(stat_loc)
+    print(stat_files)
+
+    for f in stat_files:
+        #load statistical data for subject
+        stat_subjects.append(load_file(stat_loc + '/' + f))
 
     #create list of datasets that have all but the indexed subject
     #these will be indexed at zero, so subject 2 will be 0, and subject 17 will be 14
@@ -249,8 +261,11 @@ def leave_one_out(save_path, data_loc=None, stat_loc=None):
     stat_all = list()
     #x will be the subject left out
     for x in range(len(stat_subjects)):
-        r_temp = {'data': {'ACC':np.empty((0,ACC_SF,3)), 'BVP':np.empty((0,BVP_SF,1)),
-            'EDA':np.empty((0,EDA_SF,1)), 'TEMP':np.empty((0,TEMP_SF,1))}, 'labels': []}
+        r_temp = {'data': {'ACC':np.empty((0,ACC_SF*window_size,3)),
+                'BVP':np.empty((0,BVP_SF*window_size,1)),
+                'EDA':np.empty((0,EDA_SF*window_size,1)),
+                'TEMP':np.empty((0,TEMP_SF*window_size,1))}, 'labels': []}
+
         s_temp = {'data': {'ACC':np.empty((0,8,3)), 'BVP':np.empty((0,8,1)),
             'EDA':np.empty((0,8,1)), 'TEMP':np.empty((0,8,1))}, 'labels': []}
 
@@ -354,4 +369,5 @@ def leave_one_out(save_path, data_loc=None, stat_loc=None):
             +'ACC: Accuracy = '+stat_avg_accs[0]+', F Score = '+stat_avg_fs[0]+'\n'
             +'BVP: Accuracy = '+stat_avg_accs[1]+', F Score = '+stat_avg_fs[1]+'\n'
             +'EDA: Accuracy = '+stat_avg_accs[2]+', F Score = '+stat_avg_fs[2]+'\n'
-            +'TEMP: Accuracy = '+stat_avg_accs[3]+', F Score = '+stat_avg_fs[3]+'\n\n')6
+            +'TEMP: Accuracy = '+stat_avg_accs[3]+', F Score = '+stat_avg_fs[3]+'\n\n')
+        
