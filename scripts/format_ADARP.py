@@ -31,7 +31,8 @@ def get_subject_data(path):
             'EDA':np.empty((0,int(EDA_SF*60),1)), 'TEMP':np.empty((0,int(TEMP_SF*60),1))},
                 'labels':[]}
 
-    #get files in subject's directory
+    #get files in subject's directory, this will be ordered as 0, 1, 10, 2, 3 ...
+    #because listdir is in alphabetical order, it makes no real difference
     files = listdir(path)
 
     #gather data from each data file
