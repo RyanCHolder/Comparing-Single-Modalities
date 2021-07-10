@@ -101,7 +101,7 @@ def norm(data):
         @param: data (list): The data to normalize
         @return: The normalized data
     """
-    normalized_data = (data - np.mean(data,0))/np.std(data,0)
+    normalized_data = (data - np.mean(np.mean(data,0),0))/np.std(np.std(data,0),0)
     return normalized_data
 
 def create_labels(all_labels, SF):
