@@ -24,7 +24,7 @@ EDA_SF = 4
 TEMP_SF = 4
 
 #list of classifiers, these can be easily commented out if not wanted
-#classifiers = [#SVC(),
+classifiers = [#SVC(),
         #RandomForestClassifier(),
         #MLPClassifier(),
         KNeighborsClassifier(),
