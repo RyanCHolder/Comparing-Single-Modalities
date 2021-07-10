@@ -135,7 +135,7 @@ def create_windows(data, data_SF, window_size=1):
     for x in range(0, len(data) - window_size * (data_SF//2), window_size * (data_SF//2)):
         data_windows.append(data[x : window_size * data_SF + x])
 
-    return np.array(data_windows)
+    return data_windows
 
 def save_data(path, data):
     """
