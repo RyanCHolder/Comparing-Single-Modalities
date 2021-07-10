@@ -119,21 +119,21 @@ def create_labels(all_labels, SF):
         labels.append(all_labels[x])
     return np.array(labels)
 
-def create_windows(data, data_SF):
+def create_windows(data, data_SF, window_size=1):
     """
         @brief Divide the data into one second windows with 50% overlap
 
         The rounded average of the label values will be used as the window label
 
         @param: data (list): The data to divide
-        @param: data_labels (list): The labels for the data
         @param: data_SF (int): The sampling frequency of the data
+        @param: window_size (int): The number of seconds in each window
 
         @return: The windowed data and labels
     """
     data_windows = []
-    for x in range(0, len(data) - data_SF//2, data_SF//2):
-        data_windows.append(data[x : x+data_SF])
+    for x in range(0, len(data) - window_size * (data_SF//2), window_size * (data_SF//2)):
+        data_windows.append(data[x : window_size * data_SF + x])
 
     return np.array(data_windows)
 
@@ -203,13 +203,16 @@ def get_statistics(data):
         @param data (dictionary): The data to do analysis on
         @return A new array with statistical values for each timestep
     """
+    #storage for returning
+    temp = {'data':{'ACC':[],'BVP':[],'EDA':[],'TEMP':[]}, 'labels':[]}
     #replace each timestep with statistical analysis
     for x in data['data']:
         #transpose to put each timestep as the first axis
-        data['data'][x] = np.transpose([np.mean(data['data'][x],1),
+        temp['data'][x] = np.transpose([np.mean(data['data'][x],1),
             np.median(data['data'][x],1), np.amin(data['data'][x],1),
             np.amax(data['data'][x],1), np.std(data['data'][x],1),
             stats.skew(data['data'][x],1), stats.kurtosis(data['data'][x],1),
             stats.iqr(data['data'][x],1)], axes=(1,0,2))
+    temp['labels'] = data['labels']
 
-    return data
+    return temp
