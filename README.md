@@ -8,6 +8,8 @@ In order to run this project, first use the format_data.py script file to create
   and save the regular data, and similarly use save_statistics(path) to do the same for the statistical data,
   or add calls to the functions at the end of the file with similar syntax.
   
+  Similar steps can be taken using the format_ADARP.py script for formatting ADARP data
+  
 Once the data has been saved the alg_testing.py script can be used in a similar fashion to run the learning algorithms on the data. 
   The classifiers field contains a list of all the classifiers used, which can be edited to add or remove classifiers as desired 
     (adding more sklearn classifiers would be simple, adding classifiers from outside sklearn, like the karis.Sequential already in there would cause issues)
