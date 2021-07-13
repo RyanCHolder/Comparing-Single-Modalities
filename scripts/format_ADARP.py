@@ -4,6 +4,7 @@ from scipy import stats
 from os import listdir
 import format_data
 
+
 #data directory
 data_dir = "C:/Users/ryan/Documents/REU/WESAD Learning/ADARP Data/"
 
@@ -43,7 +44,7 @@ def get_subject_data(path):
         for feat in features:
             #read file
             file = read_csv(path + f_name + '/' + feat + '.csv', header = None)
-            #get timestep, this is done for each feature but shouldn't change
+            #get timestamp, this is done for each feature but shouldn't change
             start_time = int(np.array(file)[0,0])
 
             #get sensor values and form into one minute windows (50% overlap)
@@ -51,9 +52,9 @@ def get_subject_data(path):
             #cut off the last window because a full window is not complete
             values = values[:-1]
 
-            temp[feat] = values
+            temp[feat] = np.array(values)
 
-        #assign label to one hour around stress tag
+        #assign label to 20 minutes
         #start with labels array as all nonstress
         labels = np.zeros(len(temp['ACC']))
 
@@ -67,15 +68,22 @@ def get_subject_data(path):
             tags = tags - start_time
             #find which minute this number of seconds corresponds to
             tags = np.around(tags/60)
-            #shift tag to start time of  the hour being labeled as stress (30 minutes)
-            tags = tags - 30
+            #multiply by two because of the overlap
+            tags = tags * 2
 
-            #reasign labels that are within an hour of the tag
+            #reasign labels around the tag
             for tag in tags:
-                for x in range(int(tag), int(tag)+60):
-                    #only change the label if it is within the range
+                #hour around tag (doubled because of overlap)
+                for x in range(int(tag)-120, int(tag)+120):
+                    #only change the label if it is within the length of the data
                     if x >= 0 and x < len(labels):
-                        labels[x] = 1
+                        #if tag is within 20 minutes (40 datapoints) set to stress label
+                        if x in range(int(tag)-20, int(tag)+20):
+                            labels[x] = 1
+                        #otherwise set to 'need to be removed' label
+                        #in case of overlap make sure not to overwrite stress labels
+                        elif labels[x] != 1:
+                            labels[x] = 2
         except:
             pass
 
@@ -88,6 +96,11 @@ def get_subject_data(path):
             for feat in features:
                 temp[feat] = temp[feat][:length]
             labels = labels[:length]
+
+        #remove labels and datapoints at the 'need to be removed' label
+        for feat in features:
+            temp[feat] = temp[feat][labels != 2]
+        labels = labels[labels != 2]
 
         #append the data from the file to the overall subject  data
         for feat in features:
@@ -139,7 +152,7 @@ def save_all():
         print("Finished file " + str(x))
 
     #save combined dictionaries
-    #format_data.save_data('Formatted_ADARP/Raw/All.pkl', all_raw)
+    format_data.save_data('Formatted_ADARP/Raw/All.pkl', all_raw)
     format_data.save_data('Formatted_ADARP/Statistical/All.pkl', all_stat)
 
 save_all()
