@@ -93,7 +93,24 @@ def train_alg(clf, X_train, X_test, Y_train, Y_test):
         #return accuracy and f score
         return metrics.accuracy_score(Y_test, pred), metrics.f1_score(Y_test, pred)
 
-def reg_testing(save_path, data_loc=None, stat_loc=None, iterations=10, save_iters=False):
+
+def take_sample(data):
+    """
+        @breif Takes a 1% random sample of the data
+        @return Returns the 1% sample
+    """
+    temp = {'data': {'ACC':[], 'BVP':[],'EDA':[],'TEMP':[]},'labels':[]}
+    #random indeces for 1% of the data
+    index = np.random.choice(np.arange(len(data['labels'])), len(data['labels'])//100, replace=False)
+    #take only those indexes
+    for feat in features:
+        temp['data'][feat] = data['data'][feat][index]
+    temp['labels'] = data['labels'][index]
+    #return sample
+    return temp
+
+
+def reg_testing(save_path, data_loc=None, stat_loc=None, iterations=10, save_iters=False, sample=True):
     """
         @breif: tests all algorithms on all the data, one feature at a time
             (tests statistical data, as well as only stress and baseline data)
@@ -102,6 +119,8 @@ def reg_testing(save_path, data_loc=None, stat_loc=None, iterations=10, save_ite
         @param: stat_loc (string): The file containing the statistical data
         @param: iterations (int): The number of iterations per classifier
         @param: save_iters (boolean): If true results of each iteration are saved
+        @param: sample (boolean): If true, a 1% random sample of the data will be
+            loaded to save time and memory, rather than the full dataset
     """
     #regular data
     if(data_loc==None):
@@ -114,6 +133,10 @@ def reg_testing(save_path, data_loc=None, stat_loc=None, iterations=10, save_ite
         stat = load_file('Data/Statistical/All.pkl')
     else:
         stat = load_file(stat_loc + '/All.pkl')
+
+    if(sample):
+        data = take_sample(data)
+        stat = take_sample(stat)
 
     #open save destination for results
     file = open(save_path, 'wt')
@@ -216,17 +239,21 @@ def reg_testing(save_path, data_loc=None, stat_loc=None, iterations=10, save_ite
             +'EDA: Accuracy = '+stat_avg_accs[2]+', F Score = '+stat_avg_fs[2]+'\n'
             +'TEMP: Accuracy = '+stat_avg_accs[3]+', F Score = '+stat_avg_fs[3]+'\n\n')
 
-
     #close the file
     file.close()
 
-def leave_one_out(save_path, data_loc=None, stat_loc=None, window_size=1):
+
+
+
+def leave_one_out(save_path, data_loc=None, stat_loc=None, window_size=1, sample=True):
     """
-        @breif: trains on all but one subject's data, tests on that subject
+        @breif: trains on all but one subject's data, tests on that subject666
         @param: save_path (string): The file destination for the results
         @param: data_loc (string): The file containing the raw data
         @param: stat_loc (string): The file containing the statistical data
         @param: window_size (int): Seconds in window for proper shaping
+        @param: sample (boolean): If true, a 1% random sample of the data will be
+            loaded to save time and memory, rather than the full dataset
     """
     #create lists of all subject's data
     reg_subjects = list()
@@ -240,51 +267,27 @@ def leave_one_out(save_path, data_loc=None, stat_loc=None, window_size=1):
     #append each subject from raw files
     for f in raw_files:
         #load raw data for subject
-        if(f != 'All.pkl'):
-            reg_subjects.append(load_file(data_loc + '/' + f))
-            print(f)
+        if f != 'All.pkl':
+            temp = load_file(data_loc + '/' + f)
+            #sample to reduce memory
+            if sample:
+                temp = take_sample(temp)
+            reg_subjects.append(temp)
 
     #stat data location
     if stat_loc == None:
         stat_loc = 'Data/Statistical'
     #list stat files
     stat_files = listdir(stat_loc)
-    print(stat_files)
 
     for f in stat_files:
-        #load statistical data for subject
-        stat_subjects.append(load_file(stat_loc + '/' + f))
-
-    #create list of datasets that have all but the indexed subject
-    #these will be indexed at zero, so subject 2 will be 0, and subject 17 will be 14
-    reg_all = list()
-    stat_all = list()
-    #x will be the subject left out
-    for x in range(len(stat_subjects)):
-        r_temp = {'data': {'ACC':np.empty((0,ACC_SF*window_size,3)),
-                'BVP':np.empty((0,BVP_SF*window_size,1)),
-                'EDA':np.empty((0,EDA_SF*window_size,1)),
-                'TEMP':np.empty((0,TEMP_SF*window_size,1))}, 'labels': []}
-
-        s_temp = {'data': {'ACC':np.empty((0,8,3)), 'BVP':np.empty((0,8,1)),
-            'EDA':np.empty((0,8,1)), 'TEMP':np.empty((0,8,1))}, 'labels': []}
-
-        #i will cycle through the subjects to include
-        for i in range(len(reg_subjects)):
-            if i != x:
-                #append the subject data to temp
-                r_temp['labels'] = np.append(r_temp['labels'],reg_subjects[i]['labels'],0)
-                s_temp['labels'] = np.append(s_temp['labels'],stat_subjects[i]['labels'],0)
-
-                for feat in features:
-                    #append
-                    r_temp['data'][feat] = np.append(r_temp['data'][feat],reg_subjects[i]['data'][feat],0)
-                    s_temp['data'][feat] = np.append(s_temp['data'][feat],stat_subjects[i]['data'][feat],0)
-
-        #append temp to the list
-        reg_all.append(r_temp)
-        stat_all.append(s_temp)
-    #we now have the data for all but a given subject
+        #load in statistical data for subject
+        if f != 'All.pkl':
+            temp = load_file(stat_loc + '/' + f)
+            #sample to reduce memory
+            if sample:
+                temp = take_sample(temp)
+            stat_subjects.append(temp)
 
     print('Loaded Data', flush=True)
 
@@ -313,9 +316,32 @@ def leave_one_out(save_path, data_loc=None, stat_loc=None, window_size=1):
         stat_fs = {'ACC': list(), 'BVP': list(), 'EDA': list(), 'TEMP': list()}
 
         #find and save results
-        for x in range(len(reg_all)):
+        for x in range(len(reg_subjects)):
             print('Running subject ' + str(x) + ' of 14', flush=True)
             file.write('Testing on subject '+str(x)+'\n')
+
+            #create dataset with all but given subject
+            reg_all = {'data': {'ACC':np.empty((0,ACC_SF*window_size,3)),
+                    'BVP':np.empty((0,BVP_SF*window_size,1)),
+                    'EDA':np.empty((0,EDA_SF*window_size,1)),
+                    'TEMP':np.empty((0,TEMP_SF*window_size,1))}, 'labels': []}
+
+            stat_all = {'data': {'ACC':np.empty((0,8,3)), 'BVP':np.empty((0,8,1)),
+                'EDA':np.empty((0,8,1)), 'TEMP':np.empty((0,8,1))}, 'labels': []}
+
+            #cycle through subjects
+            for i in range(len(reg_subjects)):
+                #x is the subject being left out
+                if i != x:
+                    #append data and labels to dictionaries
+                    reg_all['labels'] = np.append(reg_all['labels'],reg_subjects[i]['labels'],0)
+                    stat_all['labels'] = np.append(stat_all['labels'],stat_subjects[i]['labels'],0)
+                    for feat in features:
+                        reg_all['data'][feat] = np.append(reg_all['data'][feat],reg_subjects[i]['data'][feat],0)
+                        stat_all['data'][feat] = np.append(stat_all['data'][feat],stat_subjects[i]['data'][feat],0)
+
+            print('Testing data created')
+                        
             for feat in features:
                 #run the algorithm with all but one subject as training data
                 #the remaining subject as the testing data
