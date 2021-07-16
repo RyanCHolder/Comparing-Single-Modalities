@@ -71,7 +71,7 @@ def train_alg(clf, X_train, X_test, Y_train, Y_test, weights=None):
             #some classifiers don't have the weighting option
             clf.fit(X_train, Y_train, sample_weight = weights)
         except:
-            print("Weighting not available for given classifier")
+            print("Weighting not available for given classifier", flush=True)
             clf.fit(X_train, Y_train)
 
         #predict on testing data
