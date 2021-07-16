@@ -32,7 +32,8 @@ classifiers = [#SVC(),
         #AdaBoostClassifier(DecisionTreeClassifier()),
         #AdaBoostClassifier(RandomForestClassifier()),
         #GradientBoostingClassifier(),
-        Sequential()]
+        Sequential()
+        ]
 
 def load_file(path):
     """
@@ -45,7 +46,7 @@ def load_file(path):
 
     return data
 
-def train_alg(clf, X_train, X_test, Y_train, Y_test):
+def train_alg(clf, X_train, X_test, Y_train, Y_test, weights=None):
     """
         @brief trains the classifier on the data and finds test accuracy
 
@@ -54,6 +55,7 @@ def train_alg(clf, X_train, X_test, Y_train, Y_test):
         @param X_test (array): The testing data
         @param Y_train (array): The training labels
         @param Y_test (array): The testing labels
+        @param weights: Allow for weighting in training
 
         @return Returns the accuracy score
     """
@@ -65,7 +67,13 @@ def train_alg(clf, X_train, X_test, Y_train, Y_test):
         X_test = X_test.reshape((len(X_test), len(X_test[0])*len(X_test[0][0])))
 
         #fit the classifier to the training data
-        clf.fit(X_train, Y_train)
+        try:
+            #some classifiers don't have the weighting option
+            clf.fit(X_train, Y_train, sample_weight = weights)
+        except:
+            print("Weighting not available for given classifier")
+            clf.fit(X_train, Y_train)
+
         #predict on testing data
         pred = clf.predict(X_test)
         #return prediction accuracy and f score
@@ -84,7 +92,8 @@ def train_alg(clf, X_train, X_test, Y_train, Y_test):
 
         #train the model
         model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-        model.fit(X_train, Y_train, epochs=10, batch_size=30, validation_split=0.2, shuffle=True, verbose=0)
+        model.fit(X_train, Y_train, epochs=10, batch_size=30, validation_split=0.2,
+            shuffle=True, verbose=0, class_weight=weights)
 
         #predict on test data
         pred = np.around(model.predict(X_test, batch_size=10))
@@ -194,7 +203,9 @@ def reg_testing(save_path, data_loc=None, stat_loc=None, iterations=10, save_ite
                     file.write('Regular Data, Test Accuracy = '+str(reg_accs[feat][i])
                         +', F Score = '+str(reg_fs[feat][i])+'\n')
 
-                #we don't want to use statistical values on the convolutiaonl network
+                return
+
+                #we don't want to use statistical values on the convolutional network
                 if(type(clf) != type(Sequential())):
                     #same as before but with statistical analysis data
                     X_train, X_test, Y_train, Y_test = train_test_split(stat['data'][feat],
@@ -341,14 +352,14 @@ def leave_one_out(save_path, data_loc=None, stat_loc=None, window_size=1, sample
                         stat_all['data'][feat] = np.append(stat_all['data'][feat],stat_subjects[i]['data'][feat],0)
 
             print('Testing data created')
-                        
+
             for feat in features:
                 #run the algorithm with all but one subject as training data
                 #the remaining subject as the testing data
 
                 #train on regular data
-                acc, fs = train_alg(clf,reg_all[x]['data'][feat],
-                    reg_subjects[x]['data'][feat],reg_all[x]['labels'],
+                acc, fs = train_alg(clf,reg_all['data'][feat],
+                    reg_subjects[x]['data'][feat],reg_all['labels'],
                     reg_subjects[x]['labels'])
 
                 reg_accs[feat].append(acc)
@@ -361,8 +372,8 @@ def leave_one_out(save_path, data_loc=None, stat_loc=None, window_size=1, sample
 
                 #train on statistical data
                 if(type(clf) != type(Sequential())):
-                    acc, fs = train_alg(clf,stat_all[x]['data'][feat],
-                        stat_subjects[x]['data'][feat],stat_all[x]['labels'],
+                    acc, fs = train_alg(clf,stat_all['data'][feat],
+                        stat_subjects[x]['data'][feat],stat_all['labels'],
                         stat_subjects[x]['labels'])
 
                     stat_accs[feat].append(acc)
@@ -396,4 +407,3 @@ def leave_one_out(save_path, data_loc=None, stat_loc=None, window_size=1, sample
             +'BVP: Accuracy = '+stat_avg_accs[1]+', F Score = '+stat_avg_fs[1]+'\n'
             +'EDA: Accuracy = '+stat_avg_accs[2]+', F Score = '+stat_avg_fs[2]+'\n'
             +'TEMP: Accuracy = '+stat_avg_accs[3]+', F Score = '+stat_avg_fs[3]+'\n\n')
-        
