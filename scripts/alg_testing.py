@@ -67,11 +67,9 @@ def train_alg(clf, X_train, X_test, Y_train, Y_test, weights=None):
         X_test = X_test.reshape((len(X_test), len(X_test[0])*len(X_test[0][0])))
 
         #fit the classifier to the training data
-        try:
-            #some classifiers don't have the weighting option
+        if weights != None:
             clf.fit(X_train, Y_train, sample_weight = weights)
-        except:
-            print("Weighting not available for given classifier", flush=True)
+        else:
             clf.fit(X_train, Y_train)
 
         #predict on testing data
