@@ -67,7 +67,7 @@ def train_alg(clf, X_train, X_test, Y_train, Y_test, weights=None):
         X_test = X_test.reshape((len(X_test), len(X_test[0])*len(X_test[0][0])))
 
         #fit the classifier to the training data
-        if weights != None:
+        if np.array(weights != None).any():
             clf.fit(X_train, Y_train, sample_weight = weights)
         else:
             clf.fit(X_train, Y_train)
