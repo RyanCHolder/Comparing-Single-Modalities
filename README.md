@@ -28,7 +28,12 @@ Once the data has been saved the alg_testing.py script can be used in a similar 
   will involve a divide by zero. However, these warning can be ignored because the results are unaffected by this (stastical values during convolutional
   training will just be Nan)
   
-  imbalance_testing.py can be run similarly to alg_testing and tests a view class imbalance solutions.
+  imbalance_testing.py can be run similarly to alg_testing and tests a view class imbalance solutions. This scripts compares over sampling, under sampling, weighting,
+  as well as a combination of the three as solutions to the large class imbalance in the ADARP data.
+  
+  comb_modalities.py can also be run similarly using both WESAD and ADARP. This scripts will combine all four modalities and train the same learning
+  algorithms on all modalities. This also gives the option to oversample (which was the best performing class imbalance solution) which is advised to be used
+  if this is ran on highly imbalanced data like ADARP.
   
   The visuals.py script can be run to create graphs of the data.
   By running plot_formatted(subject), where subject is a string coressponding to the desired subject number, the formatted data will be plotted 
