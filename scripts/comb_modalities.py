@@ -221,6 +221,3 @@ def run_tests(data_path, save_path, window_size, balance):
     file.close()
 
     print('Finished', flush=True)
-
-run_tests('Formatted_WESAD/Raw/', 'Results/Combined/WESAD/',1,False)
-run_tests('Formatted_ADARP/Raw/', 'Results/Combined/ADARP/',60,True)
