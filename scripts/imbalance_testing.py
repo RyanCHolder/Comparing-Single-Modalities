@@ -625,6 +625,3 @@ def leave_one_out(save_path, data_path):
 
 
     print("Finished Leave-One-Out Testing", flush=True)
-
-reg_testing("Results/Imbalance_Testing/Random Sampling Results.txt", "Formatted_ADARP/Raw/All.pkl")
-leave_one_out("Results/Imbalance_Testing/Leave One Out Results.txt", "Formatted_ADARP/Raw/")
