@@ -43,22 +43,6 @@ def load_file(path):
     return data
 
 
-def split_stress(data):
-    """
-        @breif Separates data into stress and nonstress
-        @return Stress data, nonstress data
-    """
-    stemp = dict()
-    ntemp = dict()
-    for feat in features:
-        stemp[feat] = data['data'][feat][data['labels'] == 1]
-        ntemp[feat] = data['data'][feat][data['labels'] == 0]
-    stemp['labels'] = np.ones(len(stemp['ACC']))
-    ntemp['labels'] = np.zeros(len(ntemp['ACC']))
-    return stemp, ntemp
-
-
-
 def under_sample(data, sampling_strategy='auto'):
     """
         @breif: Runs expiriment with under-sampling
