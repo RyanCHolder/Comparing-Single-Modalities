@@ -52,3 +52,4 @@ Once the data has been saved the alg_testing.py script can be used in a similar 
   The WESAD dataset that was used can be found here:
   https://ubicomp.eti.uni-siegen.de/home/datasets/icmi18/
   
+  The ADARP dataset is currently private.
