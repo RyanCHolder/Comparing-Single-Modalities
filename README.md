@@ -1,5 +1,6 @@
-# WESAD-Learning
-Formatting data from the WESAD dataset, and running Sci-Kit Learn algorithms and a conv-net on it for comparisons
+# Comparing-Single-Modalities
+
+Formatting data from the WESAD and ADARP datasets, running several learning algorithms on them, and comparing the results from single modalities
 
 In order to run this project, first use the format_data.py script file to create a formatted version of the WESAD data.
 
